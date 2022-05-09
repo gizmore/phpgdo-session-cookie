@@ -48,7 +48,7 @@ class GDO_Session
         }
     }
     
-    public function getID()
+    public function getID() : ?string
     {
         return $this->getVar('sess_id');
     }
@@ -90,7 +90,7 @@ class GDO_Session
         }
     }
     
-    public function getVar($key)
+    public function gdoVar($key) : ?string
     {
         return self::get($key);
     }
