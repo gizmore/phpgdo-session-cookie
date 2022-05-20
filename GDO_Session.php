@@ -4,7 +4,7 @@ namespace GDO\Session;
 use GDO\Core\Application;
 use GDO\User\GDO_User;
 use GDO\Util\Math;
-use GDO\Util\AES;
+use GDO\Crypto\AES;
 use GDO\Core\Website;
 use GDO\DB\Database;
 use GDO\Net\GDT_IP;
@@ -15,10 +15,10 @@ use GDO\Util\Random;
  * The code is a bit ugly because i mimiced the GDO interface badly.
  *
  * @author gizmore
- * @version 6.11.1
+ * @version 7.0.1
  * @since 6.10.0
  */
-class GDO_Session
+final class GDO_Session
 {
     const DUMMY_COOKIE_CONTENT = 'GDO_like_16_byte';
     
@@ -50,7 +50,7 @@ class GDO_Session
     
     public function getID() : ?string
     {
-        return $this->getVar('sess_id');
+        return $this->gdoVar('sess_id');
     }
     
     public static function blank()
@@ -62,7 +62,7 @@ class GDO_Session
     
     public function getUser()
     {
-        if ($uid = $this->getVar('sess_user'))
+        if ($uid = $this->gdoVar('sess_user'))
         {
             if ($user = GDO_User::table()->findCached($uid))
             {
@@ -72,10 +72,11 @@ class GDO_Session
         }
         return GDO_User::ghost();
     }
-    public function getIP() { return $this->getVar('sess_ip'); }
-    public function getTime() { return $this->getVar('sess_time'); }
-    public function getData() { return $this->getVar('sess_data'); }
-    public function getLastURL() { return $this->getVar('sess_last_url'); }
+    
+    public function getIP() { return $this->gdoVar('sess_ip'); }
+    public function getTime() { return $this->gdoVar('sess_time'); }
+    public function getData() { return $this->gdoVar('sess_data'); }
+    public function getLastURL() { return $this->gdoVar('sess_last_url'); }
     
     public function setVar($key, $value)
     {
@@ -100,8 +101,8 @@ class GDO_Session
         return $this;
     }
     
-    private $cookieData = [];
-    private $cookieChanged = false;
+    private array $cookieData = [];
+    private bool $cookieChanged = false;
     
     /**
      * @return self
@@ -124,13 +125,14 @@ class GDO_Session
     
     public static function init($cookieName='GDOv7', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
     {
+    	$tls = Application::instance()->isTLS();
         self::$COOKIE_NAME = $cookieName;
         self::$COOKIE_DOMAIN = $domain ? $domain : $_SERVER['HTTP_HOST'];
-        self::$COOKIE_SECONDS = Math::clamp($seconds, -1, 1234567);
+        self::$COOKIE_SECONDS = Math::clampInt($seconds, -1, 1234567);
         self::$COOKIE_JS = !$httpOnly;
-        self::$COOKIE_HTTPS = $https && Website::isTLS();
+        self::$COOKIE_HTTPS = $https && $tls;
 		self::$COOKIE_SAMESITE = $samesite;
-        if (Website::isTLS())
+        if ($tls)
         {
         	$cookieName .= '_tls';
         }
@@ -317,10 +319,4 @@ class GDO_Session
         return $session;
     }
     
-}
-
-# @TODO: remove session samesite config fallback when all sites are 6.11.3
-if (!defined('GDO_SESS_SAMESITE'))
-{
-	define('GDO_SESS_SAMESITE', 'Lax');
 }
