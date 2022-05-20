@@ -25,7 +25,7 @@ class GDO_Session
     public static $INSTANCE;
     public static $STARTED = false;
     
-    public static $COOKIE_NAME = 'GDO6';
+    public static $COOKIE_NAME = 'GDOv7';
     private static $COOKIE_DOMAIN = 'localhost';
     private static $COOKIE_JS = true;
     private static $COOKIE_HTTPS = true;
@@ -122,7 +122,7 @@ class GDO_Session
         self::$STARTED = false;
     }
     
-    public static function init($cookieName='GDO6', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
+    public static function init($cookieName='GDOv7', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
     {
         self::$COOKIE_NAME = $cookieName;
         self::$COOKIE_DOMAIN = $domain ? $domain : $_SERVER['HTTP_HOST'];
