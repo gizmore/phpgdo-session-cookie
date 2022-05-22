@@ -82,7 +82,7 @@ final class GDO_Session
     {
         if ($key === 'sess_data')
         {
-            $this->cookieData = $value;
+            $this->cookieData = $value ? $value : [];
             $this->cookieChanged = true;
         }
         else
