@@ -15,7 +15,7 @@ use GDO\Util\Random;
  * The code is a bit ugly because i mimiced the GDO interface badly.
  *
  * @author gizmore
- * @version 7.0.1
+ * @version 7.0.0
  * @since 6.10.0
  */
 final class GDO_Session
