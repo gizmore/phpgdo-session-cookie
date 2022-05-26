@@ -125,7 +125,7 @@ final class GDO_Session
     
     public static function init($cookieName='GDOv7', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
     {
-    	$tls = Application::instance()->isTLS();
+    	$tls = Application::$INSTANCE->isTLS();
         self::$COOKIE_NAME = $cookieName;
         self::$COOKIE_DOMAIN = $domain ? $domain : $_SERVER['HTTP_HOST'];
         self::$COOKIE_SECONDS = Math::clampInt($seconds, -1, 1234567);
@@ -193,7 +193,7 @@ final class GDO_Session
      */
     private static function start($cookieValue=true, $cookieIP=true)
     {
-        if (Application::instance()->isCLI())
+        if (Application::$INSTANCE->isCLI())
         {
             return self::createSession();
         }
@@ -274,8 +274,8 @@ final class GDO_Session
     
     private function setCookie()
     {
-        if ( (!Application::instance()->isCLI()) &&
-            (!Application::instance()->isInstall()) &&
+        if ( (!Application::$INSTANCE->isCLI()) &&
+            (!Application::$INSTANCE->isInstall()) &&
             ($this->cookieChanged) )
         {
 			if (!setcookie(self::$COOKIE_NAME, $this->cookieContent(), [
