@@ -117,10 +117,11 @@ final class GDO_Session
         return self::$INSTANCE;
     }
     
-    public static function reset()
+    public function reset() : self
     {
         self::$INSTANCE = null;
         self::$STARTED = false;
+        return $this;
     }
     
     public static function init($cookieName='GDOv7', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
