@@ -15,7 +15,7 @@ use GDO\Util\Random;
  * The code is a bit ugly because i mimiced the GDO interface badly.
  *
  * @author gizmore
- * @version 7.0.0
+ * @version 7.0.1
  * @since 6.10.0
  */
 final class GDO_Session
@@ -275,9 +275,11 @@ final class GDO_Session
     
     private function setCookie()
     {
-        if ( (!Application::$INSTANCE->isCLI()) &&
-            (!Application::$INSTANCE->isInstall()) &&
-            ($this->cookieChanged) )
+    	$app = Application::$INSTANCE;
+        if ( (!$app->isCLI()) &&
+             (!$app->isInstall()) &&
+        	 (!$app->isUnitTests()) &&
+             ($this->cookieChanged) )
         {
 			if (!setcookie(self::$COOKIE_NAME, $this->cookieContent(), [
 				'expires' => Application::$TIME + self::$COOKIE_SECONDS,
