@@ -76,7 +76,11 @@ final class GDO_Session
     public function getIP() { return $this->gdoVar('sess_ip'); }
     public function getTime() { return $this->gdoVar('sess_time'); }
     public function getData() { return $this->gdoVar('sess_data'); }
-    public function getLastURL() { return $this->gdoVar('sess_last_url'); }
+    public function getLastURL() : ?string
+    {
+    	return GDO_User::current()->settingVar('User', 'last_url');
+    }
+    
     
     public function setVar($key, $value)
     {
