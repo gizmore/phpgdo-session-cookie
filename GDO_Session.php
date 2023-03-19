@@ -121,7 +121,7 @@ final class GDO_Session
         return self::$INSTANCE;
     }
     
-    public function reset(bool $removeInput=false) : self
+    public function reset(bool $removeInput=false): static
     {
         self::$INSTANCE = null;
         self::$STARTED = false;
