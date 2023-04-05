@@ -7,11 +7,12 @@ Cookie tempering is avoided by AES-CBC encryption.
 
 ## Installation
 
-Do not install gdo6-session-db! Instead choose this one and name it "Session".
-This is handled by the gdoadm.sh CLI installer.
+Do not install phpgdo-session-db!
+Instead choose this one and name it "Session".
+This is handled by the gdo_adm.sh CLI installer.
 
-    cd gdo6/GDO/
-    git clone https://github.com/gizmore/gdo6-session-cookie Session
+    cd phpgdo/GDO/
+    git clone https://github.com/gizmore/phpgdo-session-cookie Session
 	
     
 ### Enjoy!

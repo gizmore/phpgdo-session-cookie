@@ -15,31 +15,32 @@ use GDO\Util\Random;
  * The code is a bit ugly because i mimiced the GDO interface badly.
  *
  * @author gizmore
- * @version 7.0.1
+ * @version 7.0.2
  * @since 6.10.0
  */
 final class GDO_Session
 {
-    const DUMMY_COOKIE_CONTENT = 'GDO_like_16_byte';
-    
-    public static $INSTANCE;
+
+	final public const DUMMY_COOKIE_CONTENT = 'GDO_like_16_byte';
+
+	public static $INSTANCE;
     public static $STARTED = false;
-    
+
     public static $COOKIE_NAME = 'GDOv7';
     private static $COOKIE_DOMAIN = 'localhost';
     private static $COOKIE_JS = true;
     private static $COOKIE_HTTPS = true;
     private static $COOKIE_SAMESITE = 'Lax';
     private static $COOKIE_SECONDS = 72600;
-    
+
     public static function isDB() { return false; }
-    
+
     private $lock;
     public function setLock($lock)
     {
         $this->lock = $lock;
     }
-    
+
     public function __destruct()
     {
         if ($this->lock)
@@ -47,19 +48,19 @@ final class GDO_Session
             Database::instance()->unlock($this->lock);
         }
     }
-    
+
     public function getID() : ?string
     {
         return $this->gdoVar('sess_id');
     }
-    
+
     public static function blank()
     {
         self::$INSTANCE = new self();
         GDO_User::setCurrent(GDO_User::ghost());
         return self::$INSTANCE;
     }
-    
+
     public function getUser()
     {
         if ($uid = $this->gdoVar('sess_user'))
@@ -68,11 +69,11 @@ final class GDO_Session
             {
                 return $user;
             }
-            $this->createSession(); # somethings wrong in db!
+            static::createSession(); # somethings wrong in db!
         }
         return GDO_User::ghost();
     }
-    
+
     public function getIP() { return $this->gdoVar('sess_ip'); }
     public function getTime() { return $this->gdoVar('sess_time'); }
     public function getData() { return $this->gdoVar('sess_data'); }
@@ -80,8 +81,8 @@ final class GDO_Session
     {
     	return GDO_User::current()->settingVar('User', 'last_url');
     }
-    
-    
+
+
     public function setVar($key, $value)
     {
         if ($key === 'sess_data')
@@ -94,20 +95,20 @@ final class GDO_Session
             self::set($key, $value);
         }
     }
-    
+
     public function gdoVar($key) : ?string
     {
         return self::get($key);
     }
-    
+
     public function save()
     {
         return $this;
     }
-    
+
     private array $cookieData = [];
     private bool $cookieChanged = false;
-    
+
     /**
      * @return self
      */
@@ -120,14 +121,14 @@ final class GDO_Session
         }
         return self::$INSTANCE;
     }
-    
+
     public function reset(bool $removeInput=false): static
     {
         self::$INSTANCE = null;
         self::$STARTED = false;
         return $this;
     }
-    
+
     public static function init($cookieName='GDOv7', $domain=null, $seconds=-1, $httpOnly=true, $https=false, $samesite='Lax')
     {
     	$tls = Application::$INSTANCE->isTLS();
@@ -142,7 +143,7 @@ final class GDO_Session
         	$cookieName .= '_tls';
         }
     }
-    
+
     ######################
     ### Get/Set/Remove ###
     ######################
@@ -152,7 +153,7 @@ final class GDO_Session
         $data = $session ? $session->cookieData : [];
         return isset($data[$key]) ? $data[$key] : $initial;
     }
-    
+
     public static function set($key, $value)
     {
         if ($session = self::instance())
@@ -164,7 +165,7 @@ final class GDO_Session
             }
         }
     }
-    
+
     public static function remove($key)
     {
         if ($session = self::instance())
@@ -176,7 +177,7 @@ final class GDO_Session
             }
         }
     }
-    
+
     public static function commit()
     {
         if (self::$INSTANCE)
@@ -184,12 +185,12 @@ final class GDO_Session
             self::$INSTANCE->setCookie();
         }
     }
-    
+
     public static function getCookieValue()
     {
         return isset($_COOKIE[self::$COOKIE_NAME]) ? (string)$_COOKIE[self::$COOKIE_NAME] : null;
     }
-    
+
     /**
      * Start and get user session
      * @param string $cookieval
@@ -202,7 +203,7 @@ final class GDO_Session
         {
             return self::createSession();
         }
-        
+
         # Parse cookie value
         if ($cookieValue === true)
         {
@@ -212,7 +213,7 @@ final class GDO_Session
             }
             $cookieValue = (string)$_COOKIE[self::$COOKIE_NAME];
         }
-        
+
         # Special first cookie
         if ($cookieValue === self::DUMMY_COOKIE_CONTENT)
         {
@@ -232,10 +233,10 @@ final class GDO_Session
         {
             return self::createSession();
         }
-        
+
         return $session;
     }
-    
+
     public static function reloadCookie($cookieValue)
     {
         if ($decrypted = AES::decryptIV($cookieValue, GDO_SALT))
@@ -255,7 +256,7 @@ final class GDO_Session
         }
         return false;
     }
-    
+
     public function ipCheck()
     {
         if ($ip = $this->getIP())
@@ -264,7 +265,7 @@ final class GDO_Session
         }
         return true;
     }
-    
+
     public function timeCheck()
     {
         if ($time = $this->getTime())
@@ -276,7 +277,7 @@ final class GDO_Session
         }
         return true;
     }
-    
+
     private function setCookie()
     {
     	$app = Application::$INSTANCE;
@@ -299,7 +300,7 @@ final class GDO_Session
 			}
         }
     }
-    
+
     public function cookieContent()
     {
         if (!isset($this->cookieData['sess_id']))
@@ -312,12 +313,12 @@ final class GDO_Session
         $encrypted = AES::encryptIV($json, GDO_SALT);
         return $encrypted;
     }
-    
+
     private static function cookieSecure()
     {
         return self::$COOKIE_HTTPS;
     }
-    
+
     private static function createSession($bindIP=null)
     {
         $session = self::blank();
@@ -325,5 +326,5 @@ final class GDO_Session
         $session->setCookie();
         return $session;
     }
-    
+
 }
